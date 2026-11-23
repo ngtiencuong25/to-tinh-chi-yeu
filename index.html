@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gửi chị 💗</title>
+<meta name="description" content="Một bức thư nhỏ dành cho chị.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;700&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+:root{
+  --pink:#f7a8c0;
+  --pink-soft:#ffd6e3;
+  --pink-deep:#e8738f;
+  --cream:#fff8f1;
+  --paper:#fffaf2;
+  --ink:#6b4456;
+  --muted:#a5788b;
+  --shadow:0 10px 30px rgba(232,115,143,.18);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(160deg,#ffe4ec 0%,#fff5f0 55%,#ffeef4 100%);
+}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;width:100%;height:100%;overflow:hidden}
+
+/* top bar */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  display:flex;align-items:center;gap:12px;
+  padding:calc(var(--safe-t) + 12px) 16px 10px;
+  pointer-events:none;
+}
+.topbar > *{pointer-events:auto}
+.back{
+  background:rgba(255,255,255,.8);border:0;border-radius:999px;padding:8px 14px;
+  font:inherit;font-weight:700;font-size:14px;color:var(--pink-deep);
+  box-shadow:var(--shadow);cursor:pointer;opacity:0;transition:opacity .4s;min-height:40px;
+}
+.back.show{opacity:1}
+.progress{flex:1;height:6px;background:rgba(255,255,255,.75);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--pink-deep));border-radius:99px;transition:width .6s ease}
+.music{
+  background:rgba(255,255,255,.8);border:0;width:40px;height:40px;border-radius:50%;
+  box-shadow:var(--shadow);font-size:18px;cursor:pointer;opacity:0;transition:opacity .4s;flex-shrink:0;
+}
+.music.show{opacity:1}
+
+/* scenes */
+.scene{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:calc(var(--safe-t) + 80px) 20px calc(var(--safe-b) + 40px);
+  display:flex;flex-direction:column;
+  opacity:0;visibility:hidden;transform:translateY(24px) scale(.985);
+  transition:opacity .7s ease,transform .7s ease,visibility .7s;
+}
+.scene.active{opacity:1;visibility:visible;transform:none}
+.wrap{width:100%;max-width:440px;margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+.title{
+  font-family:'Quicksand','Nunito',sans-serif;font-weight:700;
+  font-size:clamp(22px,6vw,30px);color:var(--pink-deep);margin:0 0 10px;line-height:1.3;
+}
+.lead{font-size:clamp(18px,4.8vw,22px);color:var(--ink);margin:0 0 24px;font-weight:600;line-height:1.6}
+.sub{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 22px;max-width:360px}
+
+.btn{
+  background:linear-gradient(135deg,#f7a8c0,#e8738f);color:#fff;border:0;border-radius:999px;
+  padding:14px 30px;font:inherit;font-weight:800;font-size:17px;min-height:50px;
+  box-shadow:0 8px 22px rgba(232,115,143,.35);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;
+  margin-top:26px;
+}
+.btn:active{transform:scale(.96)}
+.btn:focus-visible,.nav button:focus-visible,.back:focus-visible,.music:focus-visible{outline:3px solid rgba(232,115,143,.5);outline-offset:3px}
+.btn.ghost{background:rgba(255,255,255,.9);color:var(--pink-deep);box-shadow:var(--shadow)}
+
+/* intro envelope */
+.envelope{
+  position:relative;width:min(280px,72vw);height:180px;margin:0 auto 30px;
+  background:var(--pink-soft);border-radius:14px;box-shadow:var(--shadow);
+  animation:float 4s ease-in-out infinite;
+}
+.envelope.open{animation:none}
+.envelope .flap{
+  position:absolute;top:0;left:0;right:0;height:50%;background:var(--pink);
+  clip-path:polygon(0 0,100% 0,50% 100%);border-radius:14px 14px 0 0;
+  transform-origin:top center;transition:transform .8s ease .1s;z-index:3;
+}
+.envelope.open .flap{transform:rotateX(180deg);z-index:1}
+.envelope .paper{
+  position:absolute;left:8%;right:8%;top:14%;height:80%;background:var(--paper);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  transition:transform 1s ease .6s;z-index:2;
+}
+.envelope.open .paper{transform:translateY(-75px)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* album */
+.album{width:100%;display:flex;flex-direction:column;align-items:center}
+.stage{
+  position:relative;width:100%;max-width:340px;aspect-ratio:3/4;
+  background:#fff;border-radius:22px;box-shadow:var(--shadow);cursor:zoom-in;
+}
+.frame{
+  position:absolute;inset:10px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(90deg,#ffe9f0 25%,#fff7fa 50%,#ffe9f0 75%);
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.frame img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transform:scale(1.06);transition:opacity .7s ease,transform 1.4s ease;
+}
+.frame img.loaded{opacity:1;transform:scale(1)}
+.err{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:16px;color:var(--muted);font-weight:600;background:#fff5f8;animation:none;
+}
+.nav{display:flex;align-items:center;gap:18px;margin-top:18px}
+.nav button{
+  width:48px;height:48px;border-radius:50%;border:0;background:#fff;box-shadow:var(--shadow);
+  font-size:22px;color:var(--pink-deep);cursor:pointer;
+}
+.nav button:active{transform:scale(.92)}
+.counter{font-weight:700;color:var(--muted);min-width:70px;font-size:15px}
+.caption{margin:14px 0 0;font-size:15px;min-height:1.6em;color:var(--ink);font-weight:600}
+
+/* couple */
+.polaroids{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%}
+.pol{
+  background:#fff;padding:10px 10px 34px;border-radius:6px;box-shadow:var(--shadow);
+  width:min(170px,42vw);transform:rotate(-4deg);position:relative;
+}
+.pol:nth-child(2){transform:rotate(3deg) translateY(12px)}
+.pol .frame{position:relative;inset:auto;aspect-ratio:3/4;border-radius:3px;animation:shimmer 1.4s linear infinite}
+.pol .frame img{position:absolute}
+.pol .err{font-size:13px;padding:10px}
+
+/* poem / memories / sorry / letter */
+.card{
+  background:var(--paper);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow);
+  width:100%;text-align:left;line-height:1.9;font-size:17px;
+}
+.poem{font-family:'Quicksand','Nunito',sans-serif;font-size:18px;line-height:2;text-align:center;font-weight:500}
+.poem p{margin:0 0 .6em}
+.diary h3{font-family:'Quicksand',sans-serif;color:var(--pink-deep);margin:0 0 12px;font-size:20px;text-align:center}
+.diary ul{list-style:none;padding:0;margin:0}
+.diary li{position:relative;padding:10px 0 10px 26px;border-bottom:1px dashed var(--pink-soft)}
+.diary li:last-child{border-bottom:0}
+.diary li::before{content:"♡";position:absolute;left:0;top:10px;color:var(--pink-deep)}
+.paper-letter{
+  background:linear-gradient(#fffaf2,#fff3e6);padding:28px 24px;border-radius:6px;
+  box-shadow:0 12px 30px rgba(120,60,80,.15);width:100%;text-align:left;
+  line-height:1.9;font-size:17px;color:var(--ink);
+}
+.paper-letter p{margin:0 0 1em}
+.paper-letter p:last-child{margin-bottom:0}
+
+/* final */
+.question{
+  font-family:'Quicksand',sans-serif;font-weight:700;font-size:clamp(22px,6.2vw,30px);
+  color:var(--pink-deep);line-height:1.4;margin:0 0 28px;
+}
+.choices{display:flex;flex-direction:column;gap:14px;width:100%;max-width:300px;align-items:center}
+.choices .btn{margin-top:0;width:100%}
+.msg{margin-top:26px;font-size:18px;line-height:1.7;font-weight:600;color:var(--ink);max-width:380px}
+.hint{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 18px;max-width:360px}
+.status{min-height:1.5em;margin:14px 0 0;font-size:14px;color:var(--muted);line-height:1.6;max-width:360px}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.msg.big{font-family:'Quicksand',sans-serif;font-size:clamp(20px,5.6vw,26px);color:var(--pink-deep);font-weight:700}
+
+/* lightbox */
+#lb{
+  position:fixed;inset:0;background:rgba(40,16,26,.88);z-index:50;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s;cursor:zoom-out;
+}
+#lb.show{opacity:1;visibility:visible}
+#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+
+@media (min-width:700px){
+  .scene{padding-left:40px;padding-right:40px}
+  .wrap{max-width:520px}
+  .stage{max-width:400px}
+  .choices{flex-direction:row;max-width:520px;justify-content:center}
+  .choices .btn{width:auto;min-width:220px}
+  .card,.paper-letter{padding:30px 32px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div id="app">
+  <header class="topbar">
+    <button id="back" class="back" aria-label="Quay lại phần trước">← Quay lại</button>
+    <div class="progress" id="bar" aria-hidden="true"><span></span></div>
+    <button id="music" class="music" aria-label="Bật hoặc tắt nhạc">🎵</button>
+  </header>
+
+  <!-- 1. Mở đầu -->
+  <section class="scene active" id="s0">
+    <div class="wrap">
+      <div class="envelope" id="env" aria-hidden="true">
+        <div class="flap"></div>
+        <div class="paper">💌</div>
+      </div>
+      <p class="lead reveal">Có một điều em muốn gửi đến chị...</p>
+      <button class="btn reveal" id="openBtn">Mở thư</button>
+    </div>
+  </section>
+
+  <!-- 2. Album của chị -->
+  <section class="scene" id="s1">
+    <div class="wrap">
+      <h2 class="title reveal">Album của chị</h2>
+      <p class="sub reveal">Trước tiên, em muốn chị nhìn lại những khoảnh khắc thật đáng yêu của chị.</p>
+      <div class="album" id="albumChi">
+        <div class="stage reveal">
+          <div class="frame">
+            <img alt="Ảnh của chị" loading="lazy" decoding="async">
+            <div class="err" hidden>Ảnh này chưa sẵn sàng 🌷</div>
+          </div>
+        </div>
+        <div class="nav reveal">
+          <button class="prev" aria-label="Ảnh trước">‹</button>
+          <span class="counter">1 / 28</span>
+          <button class="next" aria-label="Ảnh sau">›</button>
+        </div>
+        <p class="caption reveal"></p>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 3. Album của em -->
+  <section class="scene" id="s2">
+    <div class="wrap">
+      <h2 class="title reveal">Album của em</h2>
+      <p class="sub reveal">Và đây là em, người đang muốn gửi đến chị những điều chân thành nhất.</p>
+      <div class="album" id="albumEm">
+        <div class="stage reveal">
+          <div class="frame">
+            <img alt="Ảnh của em" loading="lazy" decoding="async">
+            <div class="err" hidden>Ảnh này chưa sẵn sàng 🌷</div>
+          </div>
+        </div>
+        <div class="nav reveal">
+          <button class="prev" aria-label="Ảnh trước">‹</button>
+          <span class="counter">1 / 17</span>
+          <button class="next" aria-label="Ảnh sau">›</button>
+        </div>
+        <p class="caption reveal"></p>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 4. Ảnh cặp -->
+  <section class="scene" id="s3">
+    <div class="wrap">
+      <h2 class="title reveal">Hai đứa mình</h2>
+      <p class="sub reveal">Có những khoảnh khắc nhỏ, nhưng với em, đó là cả một thế giới của hai đứa.</p>
+      <div class="polaroids">
+        <div class="pol reveal">
+          <div class="frame">
+            <img alt="Ảnh chung 1" loading="lazy" decoding="async" src="assets/anhcap-1.jpg" onload="this.classList.add('loaded')" onerror="this.nextElementSibling.hidden=false;this.hidden=true">
+            <div class="err" hidden>Ảnh này chưa sẵn sàng 🌷</div>
+          </div>
+        </div>
+        <div class="pol reveal">
+          <div class="frame">
+            <img alt="Ảnh chung 2" loading="lazy" decoding="async" src="assets/anhcap-2.jpg" onload="this.classList.add('loaded')" onerror="this.nextElementSibling.hidden=false;this.hidden=true">
+            <div class="err" hidden>Ảnh này chưa sẵn sàng 🌷</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 5. Thơ -->
+  <section class="scene" id="s4">
+    <div class="wrap">
+      <h2 class="title reveal">Thả thính</h2>
+      <div class="card poem reveal">
+        <p>Có những buổi chơi game<br>tiếng cười cứ thế nối nhau.</p>
+        <p>Có những cuộc trò chuyện vu vơ<br>mà em lại nhớ mãi.</p>
+        <p>Có giọng hát của chị<br>làm cả căn phòng dịu lại.</p>
+        <p>Và có những điều nhỏ bé<br>như thế này, khiến em thấy vui.</p>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 6. Kỷ niệm vui -->
+  <section class="scene" id="s5">
+    <div class="wrap">
+      <h2 class="title reveal">Nhật ký kỷ niệm</h2>
+      <div class="card diary reveal">
+        <h3>Những điều em không quên</h3>
+        <ul>
+          <li>Những lần cùng nhau chơi game, cùng nhau cười.</li>
+          <li>Những cuộc kể chuyện vu vơ, chẳng cần chủ đề gì cả.</li>
+          <li>Những lúc được nghe chị hát, và em lặng đi một chút.</li>
+          <li>Những khoảnh khắc bình thường, nhưng khiến em thấy vui.</li>
+        </ul>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 7. Lời xin lỗi -->
+  <section class="scene" id="s6">
+    <div class="wrap">
+      <h2 class="title reveal">Gửi chị một lời xin lỗi</h2>
+      <div class="card reveal" style="line-height:1.9">
+        <p style="margin:0 0 1em">Chị à, em biết mình còn vụng về trong cách thể hiện tình cảm.</p>
+        <p style="margin:0 0 1em">Gần đây có những lúc em vô tình lơ chị, và em xin lỗi vì điều đó có thể đã khiến chị cảm thấy mình không được quan tâm.</p>
+        <p style="margin:0 0 1em">Em không muốn biện minh cho bản thân. Em chỉ muốn học cách quan tâm và lắng nghe chị nhiều hơn, và thể hiện tình cảm của mình rõ ràng hơn.</p>
+        <p style="margin:0">Chị không cần phải trả lời ngay điều gì cả. Em chỉ muốn chị biết điều đó.</p>
+      </div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 8. Bức thư chính -->
+  <section class="scene" id="s7">
+    <div class="wrap">
+      <h2 class="title reveal">Bức thư của em</h2>
+      <div class="paper-letter" id="letterBox"></div>
+      <button class="btn" data-next>Tiếp tục ♡</button>
+    </div>
+  </section>
+
+  <!-- 9. Câu hỏi cuối -->
+  <section class="scene" id="s8">
+    <div class="wrap">
+      <p class="question reveal">Chị có đồng ý làm người yêu em không? 💗</p>
+      <p class="hint reveal">Lựa chọn của chị sẽ được gửi riêng cho em để em biết câu trả lời nhé 💗</p>
+      <div class="choices reveal" id="choices">
+        <button class="btn" id="yes">Đồng ý 💗</button>
+        <button class="btn ghost" id="later">Cho em thêm chút thời gian nhé</button>
+      </div>
+      <p class="status" id="status" aria-live="polite"></p>
+      <p class="msg big" id="yesMsg" hidden>Vậy từ hôm nay, chúng mình cùng viết tiếp câu chuyện của hai đứa nhé! 💗</p>
+      <p class="msg" id="laterMsg" hidden>Không sao cả chị nhé. Em sẽ đợi, và em vẫn luôn ở đây. Chị cứ thong thả suy nghĩ, khi nào chị muốn nói chuyện, em luôn sẵn sàng lắng nghe.</p>
+    </div>
+  </section>
+</div>
+
+<div id="lb" role="dialog" aria-label="Xem ảnh lớn"><img alt=""></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ===== NỘI DUNG BỨC THƯ =====
+     Dán nguyên văn bức thư đã duyệt vào mảng này.
+     Mỗi đoạn là một chuỗi, giữ nguyên xuống dòng bằng cách tách thành các đoạn riêng. */
+  const LETTER_PARAGRAPHS = [
+    "Chị à,",
+    "Em không biết phải bắt đầu bức thư này từ đâu nữa. Có nhiều điều em muốn nói với chị, nhưng mỗi lần nghĩ đến việc nói ra, em lại thấy mình thật vụng về. Có lẽ vì những điều em dành cho chị không chỉ đơn giản là vài câu nói dễ thương, mà còn là những cảm xúc em đã âm thầm giữ trong lòng suốt một khoảng thời gian.",
+    "Em vẫn nhớ những lần hai đứa cùng chơi game, những lúc chẳng cần làm gì đặc biệt mà vẫn có thể nói chuyện với nhau thật lâu. Có khi chỉ là kể vài chuyện vu vơ trong ngày, có khi là những câu chuyện chẳng đầu chẳng cuối, vậy mà em vẫn thấy vui.",
+    "Em thích những khoảnh khắc như thế. Thích cảm giác được nghe chị kể chuyện, được biết hôm nay chị có gì vui, có gì buồn. Và em cũng thích cả những lúc được nghe chị hát nữa. Có lẽ chị không biết đâu, nhưng những lúc ấy em thường cảm thấy mọi thứ xung quanh trở nên dịu dàng hơn một chút.",
+    "Em không biết từ lúc nào mà những điều nhỏ bé ấy lại trở nên đặc biệt với em đến vậy.",
+    "Có lẽ em đã thích chị từ những điều bình thường nhất.",
+    "Từ một lần chơi game cùng nhau, từ những câu chuyện vu vơ, từ giọng hát mà em muốn nghe thêm một chút nữa. Từ những lần em mong chị có thời gian để trò chuyện, rồi vui vẻ cả ngày chỉ vì một tin nhắn của chị.",
+    "Nếu tình cảm là một điều gì đó thật lớn lao, thì có lẽ tình cảm của em dành cho chị lại bắt đầu từ những điều nhỏ bé như vậy.",
+    "Em cũng muốn xin lỗi chị.",
+    "Em biết mình vẫn còn vụng về trong việc thể hiện tình cảm. Có những lúc em muốn quan tâm chị nhiều hơn, muốn nói những lời dịu dàng hơn, nhưng cuối cùng lại chẳng biết phải nói thế nào cho đúng.",
+    "Và gần đây, em đã có những lúc vô tình lơ chị.",
+    "Em xin lỗi vì điều đó. Em không muốn chị cảm thấy mình không được quan tâm, cũng không muốn những sự im lặng hay cách cư xử thiếu tinh tế của em khiến chị phải buồn.",
+    "Em biết một lời xin lỗi không thể thay đổi những gì đã xảy ra, nhưng em thật lòng muốn chị biết rằng em có để tâm đến cảm xúc của chị. Em sẽ cố gắng học cách thể hiện tình cảm tốt hơn, không chỉ bằng những lời nói dễ thương mà còn bằng sự quan tâm và cách em đối xử với chị mỗi ngày.",
+    "Chị biết không, em từng nghĩ rằng chỉ cần thích một người thật nhiều thì người đó sẽ tự hiểu được tình cảm của mình. Nhưng sau này em mới nhận ra, tình cảm không chỉ cần được giữ trong lòng, mà còn cần được thể hiện bằng những điều chân thành.",
+    "Em không muốn chị phải đoán xem em đang nghĩ gì, cũng không muốn chị phải tự hỏi liệu mình có quan trọng với em hay không.",
+    "Vì chị thật sự rất quan trọng với em.",
+    "Em thích chị, thích sự dịu dàng của chị, thích những câu chuyện chị kể, thích cả những lúc chị vui vẻ và vô tư. Em thích được ở bên chị trong những khoảnh khắc bình thường nhất, bởi vì đôi khi chính những điều bình thường ấy lại khiến em cảm thấy hạnh phúc nhất.",
+    "Nếu được chọn một điều để mong muốn, em mong rằng sau này chúng ta vẫn có thể cùng nhau tạo thêm thật nhiều kỷ niệm.",
+    "Có thể là những trận game vui vẻ, những cuộc trò chuyện chẳng có chủ đề gì, những lần chị hát cho em nghe, hay đơn giản là những lúc cả hai cùng kể nhau nghe về một ngày đã qua.",
+    "Em không mong mọi thứ phải thật hoàn hảo. Em chỉ mong chúng ta có thể chân thành với nhau, quan tâm nhau và cùng nhau trưởng thành hơn từng chút một.",
+    "Và hôm nay, em muốn nói với chị một điều mà em đã suy nghĩ rất nhiều.",
+    "Em thích chị.",
+    "Không phải chỉ vì chị dễ thương, cũng không phải chỉ vì chị khiến em vui. Mà bởi vì em thật sự muốn được hiểu chị nhiều hơn, muốn được quan tâm chị nhiều hơn và muốn trở thành một người có thể mang đến cho chị những điều tốt đẹp.",
+    "Em muốn được cùng chị tạo nên những kỷ niệm mới, muốn được nghe chị kể những câu chuyện của chị, muốn được ở bên chị trong những ngày vui và cả những ngày không vui.",
+    "Em không biết tương lai sẽ như thế nào, nhưng em biết tình cảm em dành cho chị ở hiện tại là thật lòng.",
+    "Vậy nên...",
+    "Chị có đồng ý làm người yêu em không? 💗",
+    "Nếu chị đồng ý, em sẽ rất hạnh phúc.",
+    "Còn nếu chị cần thêm thời gian để suy nghĩ, em cũng sẽ tôn trọng chị. Em chỉ mong chị biết rằng bức thư này được viết bằng tất cả sự chân thành mà em có.",
+    "Cảm ơn chị vì đã xuất hiện trong những ngày tháng của em.",
+    "Cảm ơn chị vì những trận game, những câu chuyện vu vơ và cả những lần hát cho em nghe.",
+    "Và cảm ơn chị, vì đã trở thành một người đặc biệt đối với em.",
+    "Thương chị thật nhiều.",
+    "Em."
+  ];
+
+  const CAPTIONS_CHI = [
+    'Một khoảnh khắc thật đáng yêu',
+    'Nụ cười này làm em nhớ mãi',
+    'Chị lúc nào cũng dễ thương',
+    'Ảnh này em thích lắm',
+    'Khoảnh khắc nhỏ mà ấm áp',
+    'Giữ lại cho thật lâu nhé'
+  ];
+  const CAPTIONS_EM = [
+    'Và đây là em',
+    'Gửi chị những điều chân thành',
+    'Một chút ngại ngùng của em',
+    'Khoảnh khắc này gửi cho chị',
+    'Mong chị luôn vui nhé'
+  ];
+
+  /* ===== FORMSPREE ===== */
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mkjrpjyp';
+  const SOURCE = 'love-letter';
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ===== RENDER THƯ ===== */
+  const letterBox = $('#letterBox');
+  LETTER_PARAGRAPHS.forEach(text => {
+    const p = document.createElement('p');
+    p.textContent = text;
+    p.className = 'reveal';
+    letterBox.appendChild(p);
+  });
+
+  /* ===== HIỆU ỨNG CANVAS (tim, cánh hoa) ===== */
+  const cv = $('#fx');
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cv.width = W * DPR;
+    cv.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const lowEnd = (navigator.hardwareConcurrency || 4) <= 4 || window.innerWidth < 600;
+  const AMBIENT = reduce ? 0 : (lowEnd ? 10 : 18);
+  const COLORS = ['#f7a8c0', '#ffc4d6', '#ff8fab', '#fbd3e0', '#ffffff'];
+  const parts = [];
+
+  function makeAmbient() {
+    return {
+      ambient: true,
+      type: Math.random() < 0.6 ? 'heart' : 'petal',
+      x: rand(0, W), y: rand(0, H),
+      vx: rand(-0.25, 0.25), vy: -rand(0.25, 0.7),
+      s: rand(8, 15), r: rand(0, 6), vr: rand(-0.015, 0.015),
+      a: rand(0.45, 0.85),
+      color: COLORS[(Math.random() * 4) | 0]
+    };
+  }
+  for (let k = 0; k < AMBIENT; k++) parts.push(makeAmbient());
+
+  function burst(x, y, n) {
+    for (let k = 0; k < n; k++) {
+      const an = rand(0, Math.PI * 2), sp = rand(2, 6.5);
+      parts.push({
+        ambient: false, type: 'heart', x, y,
+        vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - 2.5,
+        s: rand(10, 22), r: rand(0, 6), vr: rand(-0.08, 0.08),
+        a: 1, life: 110, color: COLORS[(Math.random() * 4) | 0]
+      });
+    }
+  }
+
+  function drawHeart(x, y, s) {
+    ctx.beginPath();
+    ctx.moveTo(x, y + s / 4);
+    ctx.bezierCurveTo(x, y, x - s / 2, y, x - s / 2, y + s / 4);
+    ctx.bezierCurveTo(x - s / 2, y + s / 2, x, y + s * 0.75, x, y + s);
+    ctx.bezierCurveTo(x, y + s * 0.75, x + s / 2, y + s / 2, x + s / 2, y + s / 4);
+    ctx.bezierCurveTo(x + s / 2, y, x, y, x, y + s / 4);
+    ctx.closePath();
+    ctx.fill();
+  }
+  function drawPetal(s) {
+    ctx.beginPath();
+    ctx.ellipse(0, 0, s * 0.55, s * 0.28, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.r += p.vr;
+      if (p.ambient) {
+        if (p.y < -30) { p.y = H + 20; p.x = rand(0, W); }
+        if (p.x < -30) p.x = W + 20;
+        if (p.x > W + 30) p.x = -20;
+      } else {
+        p.vy += 0.08;
+        p.vx *= 0.985;
+        p.life--;
+        if (p.life <= 0) { parts.splice(i, 1); continue; }
+      }
+      ctx.save();
+      ctx.globalAlpha = p.ambient ? p.a : Math.min(1, p.life / 35) * p.a;
+      ctx.fillStyle = p.color;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      if (p.type === 'heart') drawHeart(-p.s / 2, -p.s / 2, p.s);
+      else drawPetal(p.s);
+      ctx.restore();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ===== ĐIỀU HƯỚNG CÁC PHẦN ===== */
+  const scenes = $$('.scene');
+  let cur = -1;
+  let musicStarted = false;
+
+  function reveal(scene) {
+    $$('.reveal', scene).forEach((el, k) => {
+      el.classList.remove('in');
+      setTimeout(() => el.classList.add('in'), 250 + Math.min(k, 12) * 180);
+    });
+  }
+
+  function goTo(i) {
+    if (i < 0 || i >= scenes.length || i === cur) return;
+    if (cur >= 0) scenes[cur].classList.remove('active');
+    cur = i;
+    const s = scenes[cur];
+    s.scrollTop = 0;
+    s.classList.add('active');
+    reveal(s);
+    $('#bar span').style.width = (cur / (scenes.length - 1) * 100) + '%';
+    $('#back').classList.toggle('show', cur > 0);
+    $('#music').classList.toggle('show', cur > 0 && musicStarted);
+  }
+
+  $$('[data-next]').forEach(b => b.addEventListener('click', () => goTo(cur + 1)));
+  $('#back').addEventListener('click', () => goTo(cur - 1));
+
+  /* ===== ALBUM ===== */
+  const lb = $('#lb');
+  const lbImg = $('img', lb);
+  let lbOpen = false;
+  function openLB(src) {
+    lbImg.src = src;
+    lb.classList.add('show');
+    lbOpen = true;
+  }
+  function closeLB() {
+    lb.classList.remove('show');
+    lbOpen = false;
+  }
+  lb.addEventListener('click', closeLB);
+
+  function makeAlbum(root, prefix, count, captions) {
+    const img = $('img', root);
+    const err = $('.err', root);
+    const counter = $('.counter', root);
+    const cap = $('.caption', root);
+    const stage = $('.stage', root);
+    let i = 0;
+    let justSwiped = false;
+
+    const wrap = n => ((n % count) + count) % count;
+    const src = n => `assets/${prefix}-${n}.jpg`;
+    const preload = n => { const p = new Image(); p.src = src(wrap(n) + 1); };
+
+    function show(n) {
+      i = wrap(n);
+      img.classList.remove('loaded');
+      err.hidden = true;
+      img.hidden = false;
+      img.src = src(i + 1);
+      counter.textContent = `${i + 1} / ${count}`;
+      cap.textContent = captions[i % captions.length];
+      preload(i + 1);
+      preload(i - 1);
+    }
+
+    img.addEventListener('load', () => img.classList.add('loaded'));
+    img.addEventListener('error', () => {
+      err.hidden = false;
+      console.warn('Thiếu hoặc không tải được ảnh:', img.getAttribute('src'));
+    });
+
+    $('.prev', root).addEventListener('click', () => show(i - 1));
+    $('.next', root).addEventListener('click', () => show(i + 1));
+
+    stage.addEventListener('click', () => {
+      if (justSwiped) { justSwiped = false; return; }
+      if (img.classList.contains('loaded')) openLB(img.src);
+    });
+
+    let sx = null;
+    stage.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', e => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx;
+      sx = null;
+      if (Math.abs(dx) > 40) {
+        justSwiped = true;
+        show(dx < 0 ? i + 1 : i - 1);
+      }
+    }, { passive: true });
+
+    show(0);
+    return { step: d => show(i + d) };
+  }
+
+  const albumChi = makeAlbum($('#albumChi'), 'chi', 28, CAPTIONS_CHI);
+  const albumEm = makeAlbum($('#albumEm'), 'zen', 17, CAPTIONS_EM);
+  const albumByScene = { 1: albumChi, 2: albumEm };
+
+  document.addEventListener('keydown', e => {
+    if (lbOpen && e.key === 'Escape') { closeLB(); return; }
+    const album = albumByScene[cur];
+    if (!album) return;
+    if (e.key === 'ArrowRight') album.step(1);
+    if (e.key === 'ArrowLeft') album.step(-1);
+  });
+
+  /* ===== NHẠC NỀN (Web Audio, giai điệu gốc đơn giản) ===== */
+  // [tần số Hz, độ dài theo nhịp]; 0 là khoảng lặng
+  const MELODY = [
+    [523.25, 1], [587.33, 1], [659.25, 2], [783.99, 1],
+    [659.25, 1], [587.33, 2], [523.25, 1], [440.00, 1],
+    [523.25, 2], [659.25, 1], [783.99, 1], [880.00, 2],
+    [783.99, 1], [659.25, 1], [587.33, 2], [0, 1]
+  ];
+  const BEAT = 0.62;
+  let actx = null, master = null, timer = null, nextTime = 0, idx = 0, musicOn = false;
+
+  function playNote(freq, dur, when) {
+    if (!freq) return;
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, when);
+    g.gain.linearRampToValueAtTime(0.09, when + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + dur * 0.95);
+    o.connect(g).connect(master);
+    o.start(when);
+    o.stop(when + dur);
+
+    const o2 = actx.createOscillator();
+    const g2 = actx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.value = freq / 2;
+    g2.gain.setValueAtTime(0, when);
+    g2.gain.linearRampToValueAtTime(0.03, when + 0.05);
+    g2.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+    o2.connect(g2).connect(master);
+    o2.start(when);
+    o2.stop(when + dur);
+  }
+
+  function schedule() {
+    if (!actx) return;
+    while (nextTime < actx.currentTime + 0.6) {
+      const [f, b] = MELODY[idx % MELODY.length];
+      const d = b * BEAT;
+      playNote(f, d, nextTime);
+      nextTime += d;
+      idx++;
+    }
+  }
+
+  function musicOnStart() {
+    try {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        actx = new AC();
+        master = actx.createGain();
+        master.gain.value = 0.9;
+        master.connect(actx.destination);
+      }
+      if (actx.state === 'suspended') actx.resume();
+      nextTime = Math.max(nextTime, actx.currentTime + 0.1);
+      master.gain.setTargetAtTime(0.9, actx.currentTime, 0.1);
+      clearInterval(timer);
+      timer = setInterval(schedule, 200);
+      schedule();
+      musicOn = true;
+    } catch (err) {
+      console.warn('Không bật được nhạc:', err);
+    }
+    $('#music').textContent = '🎵';
+    $('#music').setAttribute('aria-pressed', 'true');
+  }
+
+  function musicOff() {
+    clearInterval(timer);
+    if (actx) master.gain.setTargetAtTime(0, actx.currentTime, 0.1);
+    musicOn = false;
+    $('#music').textContent = '🔇';
+    $('#music').setAttribute('aria-pressed', 'false');
+  }
+
+  $('#music').addEventListener('click', () => {
+    if (musicOn) musicOff(); else musicOnStart();
+  });
+
+  /* ===== MỞ THƯ ===== */
+  $('#openBtn').addEventListener('click', function () {
+    this.disabled = true;
+    $('#env').classList.add('open');
+    musicStarted = true;
+    musicOnStart();
+    setTimeout(() => goTo(1), 1300);
+  });
+
+  /* ===== CÂU HỎI CUỐI ===== */
+  /* ===== GỬI LỰA CHỌN QUA FORMSPREE ===== */
+  const yesBtn = $('#yes');
+  const laterBtn = $('#later');
+  const statusEl = $('#status');
+  let sending = false;
+  let answered = false;
+
+  function setBusy(on) {
+    yesBtn.disabled = on;
+    laterBtn.disabled = on;
+  }
+
+  function celebrate() {
+    if (reduce) return;
+    let n = 0;
+    const t = setInterval(() => {
+      burst(rand(W * 0.2, W * 0.8), rand(H * 0.3, H * 0.7), 26);
+      if (++n >= 5) clearInterval(t);
+    }, 260);
+  }
+
+  async function sendAnswer(answer) {
+    if (sending || answered) return;
+    sending = true;
+    setBusy(true);
+    statusEl.textContent = 'Đang gửi...';
+
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 15000);
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ answer, source: SOURCE }),
+        signal: ctrl.signal
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      answered = true;
+      statusEl.textContent = '';
+      if (answer === 'accepted') {
+        $('#yesMsg').hidden = false;
+        celebrate();
+      } else {
+        $('#laterMsg').hidden = false;
+      }
+    } catch (err) {
+      console.warn('Gửi câu trả lời chưa thành công:', err && err.name);
+      statusEl.textContent = 'Lựa chọn chưa gửi được lúc này, có thể do mạng yếu. Chị thử lại giúp em nhé 💗';
+      setBusy(false);
+    } finally {
+      clearTimeout(timeout);
+      sending = false;
+    }
+  }
+
+  yesBtn.addEventListener('click', () => sendAnswer('accepted'));
+  laterBtn.addEventListener('click', () => sendAnswer('need_time'));
+
+  /* ===== KHỞI TẠO ===== */
+  goTo(0);
+})();
+</script>
+</body>
+</html>
